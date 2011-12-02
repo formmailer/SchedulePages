@@ -126,7 +126,7 @@ class ProcessScheduledPosts extends WireData implements Module {
 			// These should not be unpublished.
 			if($p->publish_until >= $date) $published->remove($p);
 		}
-		// Unublish all the remaining pages in the array
+		// Unpublish all the remaining pages in the array
 		foreach($published as $p) {
 			$p->addStatus(Page::statusUnpublished); 
 			$p->save(); 
