@@ -1,7 +1,7 @@
 <?php
 
 /**
- * ProcessWire Process Scheduled Posts Module
+ * ProcessWire Schedule Pages Module
  *
  * Copyright 2011 by Jasper Metselaar (jasper@formmailer.net)
  * Licensed under GNU/GPL v2, see http://processwire.com/about/license/
@@ -22,7 +22,7 @@
  *
  * Usage:
  * ======
- * 1. 	Place the ProcessScheduledPosts.module file into the 
+ * 1. 	Place the SchedulePages.module file into the 
  *		site/modules folder and install the plugin from the admin
  *		area.
  * 2.	Install the LazyCron module (if you haven't already). This
@@ -40,7 +40,7 @@
  *		executed when using ProcessWire's API from other scripts.
  */
  
-class ProcessScheduledPosts extends WireData implements Module {
+class SchedulePages extends WireData implements Module {
 
 	/**
 	 * getModuleInfo is a module required by all modules to tell ProcessWire about them
@@ -53,7 +53,7 @@ class ProcessScheduledPosts extends WireData implements Module {
 		return array(
 
 			// The module'ss title, typically a little more descriptive than the class name
-			'title' => 'Scheduled Posts', 
+			'title' => 'Scheduled Pages', 
 
 			// version: major, minor, revision, i.e. 100 = 1.0.0
 			'version' => 100, 
@@ -86,7 +86,7 @@ class ProcessScheduledPosts extends WireData implements Module {
 	// initialize the hook in your AutoLoad module
 	public function init() {
 		// Run this module on a daily basis using LazyCron
-		$this->addHook('LazyCron::everyDay', $this, 'RunScheduledPosts'); 
+		$this->addHook('LazyCron::everyDay', $this, 'RunSchedulePages'); 
 	}
 	
 	
@@ -94,7 +94,7 @@ class ProcessScheduledPosts extends WireData implements Module {
 	 * Checks for pages that need to be published or unpublished.
 	 *
 	 */
-	public function RunScheduledPosts() {
+	public function RunSchedulePages() {
 		$date = mktime(0, 0, 0, date("m/d/Y")) ; // Get timestamp for current date
 
 		// Select unpublished sites with a publish_from date < the current date and
