@@ -28,13 +28,14 @@
  * 2.	Install the LazyCron module (if you haven't already). This
  *		module is part of the Processwire core, but it isn't 
  *		activated by default.
- * 3.	Add the following date fields to your template (feel free to 
- *		activate the date picker input option if you like): 
+ * 3.	Add the following date fields to your template: 
  *		publish_from
  *		publish_until
+ *		Note: the fields are already created during the 
+ *		installation of the module
  * 4.	That't all. LazyCron will run take care of (un)publishing
  *		your pages that have a the publish dates set. It will run
- *		daily. 
+ *		every hour. 
  *		Please note: LazyCron hooks are only executed during 
  *		pageviews that are delivered by ProcessWire. They are not 
  *		executed when using ProcessWire's API from other scripts.
@@ -53,10 +54,10 @@ class SchedulePages extends WireData implements Module {
 		return array(
 
 			// The module'ss title, typically a little more descriptive than the class name
-			'title' => 'Scheduled Pages', 
+			'title' => 'Schedule Pages', 
 
 			// version: major, minor, revision, i.e. 100 = 1.0.0
-			'version' => 100, 
+			'version' => 101, 
 
 			// summary is brief description of what this module is
 			'summary' => 'This module allows scheduling (un)publication of pages.',
@@ -86,7 +87,7 @@ class SchedulePages extends WireData implements Module {
 	// initialize the hook in your AutoLoad module
 	public function init() {
 		// Run this module on a daily basis using LazyCron
-		$this->addHook('LazyCron::everyDay', $this, 'RunSchedulePages'); 
+		$this->addHook('LazyCron::everyHour', $this, 'RunSchedulePages'); 
 	}
 	
 	
@@ -95,16 +96,16 @@ class SchedulePages extends WireData implements Module {
 	 *
 	 */
 	public function RunSchedulePages() {
-		$date = mktime(0, 0, 0, date("m/d/Y")) ; // Get timestamp for current date
+		$time = time(); ; // Get timestamp for current date
 
 		// Select unpublished sites with a publish_from date < the current date and
 		// add them to an array.
-		$unpublished = wire("pages")->find("status=unpublished, publish_from<$date");
+		$unpublished = wire("pages")->find("status=unpublished, publish_from<$time");
 		foreach($unpublished as $p) {
 			$p->setOutputFormatting(false); // Avoid date being formated.
 			// Remove pages with a publish_until date < current date from the array. These
 			// should not be published.
-			if($p->publish_until > 0 && $p->publish_until < $date) $unpublished->remove($p); 
+			if($p->publish_until > 0 && $p->publish_until < $time) $unpublished->remove($p); 
 		}
 		// Publish all the remaining pages in the array
 		foreach($unpublished as $p) {
@@ -113,7 +114,7 @@ class SchedulePages extends WireData implements Module {
 			// Following 2 lines are for debug only
 			/* 
 			echo "$p - Page $p->title is published - Publish from $p->publish_from - 
-			Publish until $p->publish_until - Current time/date: $date <br />";	
+			Publish until $p->publish_until - Current time/date: $time <br />";	
 			*/ 
 			
 		}
@@ -124,7 +125,7 @@ class SchedulePages extends WireData implements Module {
 			$p->setOutputFormatting(false); // Avoid date being formated.
 			// Remove pages with a publish_until date >= current date from the array. 
 			// These should not be unpublished.
-			if($p->publish_until >= $date) $published->remove($p);
+			if($p->publish_until >= $time) $published->remove($p);
 		}
 		// Unpublish all the remaining pages in the array
 		foreach($published as $p) {
@@ -133,9 +134,44 @@ class SchedulePages extends WireData implements Module {
 			// Following 2 lines are for debug only
 			/* 
 			echo "$p - Page $p->title is unpublished - Publish from $p->publish_from - Publish until 
-			$p->publish_until - Current time/date: $date <br />";
+			$p->publish_until - Current time/date: $time <br />";
 			*/
 		}
 	}
 	
+	public function ___install() {
+	// Add the required fields for this module
+		$field = new Field();
+		$field->type = $this->modules->get("FieldtypeDatetime");
+		$field->name = 'publish_from';
+		$field->label = 'Publish From Date';
+		$field->dateOutputFormat = wire('config')->dateFormat;
+		$field->dateInputFormat = wire('config')->dateFormat;
+		$field->datepicker = 1; // if you want datepicker enabled
+		$field->defaultToday = 0; // if you want dates to default to today
+		$field->save();
+		
+		$field = new Field();
+		$field->type = $this->modules->get("FieldtypeDatetime");
+		$field->name = 'publish_until';
+		$field->label = 'Publish Until Date';
+		$field->dateOutputFormat = wire('config')->dateFormat;
+		$field->dateInputFormat = wire('config')->dateFormat;
+		$field->datepicker = 1; // if you want datepicker enabled
+		$field->defaultToday = 0; // if you want dates to default to today
+		$field->save();
+	}
+	
+	public function ___uninstall() {
+	// Remove the module's fields
+		$field = wire('fields')->get('publish_from'); 
+		if($field && $field->numFieldgroups() > 0) 
+			throw new WireException("Can't uninstall because field publish_from is still being used. Please remove it from any templates."); 
+		wire('fields')->delete($field); 
+		$field = wire('fields')->get('publish_until'); 
+		if($field && $field->numFieldgroups() > 0) 
+			throw new WireException("Can't uninstall because field publish_until is still being used. Please remove it from any templates."); 
+		wire('fields')->delete($field); 
+
+	}
 }
