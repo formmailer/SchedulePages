@@ -74,6 +74,8 @@ class SchedulePages extends WireData implements Module {
 			// hooks won't get attached unless some other code calls the module on it's own.
 			// Note that autoload modules are almost always also 'singular' (seen above).
 			'autoload' => true, 
+			// This module requires the LazyCron module.
+			'requires' => "LazyCron"
 			);
 	}
 
