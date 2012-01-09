@@ -63,7 +63,7 @@ class SchedulePages extends WireData implements Module {
 			'summary' => 'This module allows scheduling (un)publication of pages.',
 			
 			// Optional URL to more information about the module
-			'href' => 'http://processwire.com/talk/index.php/topic,773.0.html',
+			'href' => 'http://www.processwire.com/talk/topic/711-release-schedulepages/',
 
 			// singular=true: indicates that only one instance of the module is allowed.
 			// This is usually what you want for modules that attach hooks. 
