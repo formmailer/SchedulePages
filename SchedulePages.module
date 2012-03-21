@@ -117,7 +117,7 @@ class SchedulePages extends WireData implements Module, ConfigurableModule {
 			return;
 		}
 
-		if ($page->publish_until < $time) {
+		if ($page->publish_until < $time && $page->publish_until > 0) {
 			if ($page->is(Page::statusUnpublished)) return;
 			$this->session->error($this->_("Page saved, but not published. Change publish until setting if you want to publish this now."));
 			$page->setOutputFormatting(false);
