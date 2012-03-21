@@ -22,8 +22,10 @@ Usage:
 1. 	Place the SchedulePages.module file into the 
 	site/modules folder and install the plugin from the admin
 	area.
-2.	Install the LazyCron module (if you haven't already). This
-	module is part of the Processwire core, but it isn't 
+	You can choose how often the cron requires to run. (thanks to
+	Apeisa)
+2.	The LazyCron module will be installed (if you haven't already).
+	This module is part of the Processwire core, but it isn't
 	activated by default.
 3.	Add the following date fields to your template: 
 	publish_from
@@ -31,8 +33,7 @@ Usage:
 	Note: the fields are already created during the 
 	installation of the module
 4.	That't all. LazyCron will run take care of (un)publishing
-	your pages that have a the publish dates set. It will run
-	every hour. 
+	your pages that have a the publish dates set.
 	Please note: LazyCron hooks are only executed during 
 	pageviews that are delivered by ProcessWire. They are not 
 	executed when using ProcessWire's API from other scripts.
