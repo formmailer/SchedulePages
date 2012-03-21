@@ -35,7 +35,9 @@
  *		installation of the module
  * 4.	That't all. LazyCron will run take care of (un)publishing
  *		your pages that have a the publish dates set. It will run
- *		every hour.
+ *		every hour by default (you can choose interval from module
+ *		options).
+ *
  *		Please note: LazyCron hooks are only executed during
  *		pageviews that are delivered by ProcessWire. They are not
  *		executed when using ProcessWire's API from other scripts.
@@ -108,6 +110,7 @@ class SchedulePages extends WireData implements Module, ConfigurableModule {
 
 		$time = time();
 
+		// Check if publish_from and _until dates doesn't make any sense and disallow publishing if so
 		if ($page->publish_from > $page->publish_until && $page->publish_from > 0 && $page->publish_until > 0) {
 			if ($page->is(Page::statusUnpublished)) return;
 			$this->session->error($this->_("Your publish from setting is later than publish until. Please correct your dates. We play it save and don't allow publishing."));
@@ -117,7 +120,8 @@ class SchedulePages extends WireData implements Module, ConfigurableModule {
 			return;
 		}
 
-		if ($page->publish_until < $time) {
+		// Check if publish_until is before current time, don't allow publishing on that situation
+		if ($page->publish_until < $time && $page->publish_until > 0) {
 			if ($page->is(Page::statusUnpublished)) return;
 			$this->session->error($this->_("Page saved, but not published. Change publish until setting if you want to publish this now."));
 			$page->setOutputFormatting(false);
@@ -126,6 +130,7 @@ class SchedulePages extends WireData implements Module, ConfigurableModule {
 			return;
 		}
 
+		// Check if publish_from is later than current time, don't allow publishing on that situation
 		if ($page->publish_from > $time) {
 			if ($page->is(Page::statusUnpublished)) return;
 			$this->session->error($this->_("Page saved, but not published. Change publish from setting if you want to publish this now."));
@@ -134,9 +139,6 @@ class SchedulePages extends WireData implements Module, ConfigurableModule {
 			$page->save();
 			return;
 		}
-
-
-
 	}
 
 
@@ -231,6 +233,5 @@ class SchedulePages extends WireData implements Module, ConfigurableModule {
 		if($field && $field->numFieldgroups() > 0)
 			throw new WireException("Can't uninstall because field publish_until is still being used. Please remove it from any templates.");
 		wire('fields')->delete($field);
-
 	}
 }
