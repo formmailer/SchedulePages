@@ -154,8 +154,10 @@ class SchedulePages extends WireData implements Module, ConfigurableModule {
 		$unpublished = wire("pages")->find("status=unpublished, publish_from<$time");
 		foreach($unpublished as $p) {
 			$p->setOutputFormatting(false); // Avoid date being formated.
-			// Publish pages with a publish_until date > current date
-			if($p->publish_until > $time) {
+			// Publish pages with a publish_until date > current date (and publish_until is set)
+			if ($p->publish_until > 0 && $p->publish_until <= $time) {
+				// We keep it unpublished, since publish until is set and valid
+				} else {
 				$p->removeStatus(Page::statusUnpublished);
 				$p->save();
 			}
