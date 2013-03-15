@@ -157,7 +157,8 @@ class SchedulePages extends WireData implements Module, ConfigurableModule {
 			// Publish pages with a publish_until date > current date (and publish_until is set)
 			if ($p->publish_until > 0 && $p->publish_until <= $time) {
 				// We keep it unpublished, since publish until is set and valid
-				} else {
+			} else if ($p->publish_from) {
+				// If publish_from is defined, publish page
 				$p->removeStatus(Page::statusUnpublished);
 				$p->save();
 			}
