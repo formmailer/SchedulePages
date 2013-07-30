@@ -37,3 +37,9 @@ Usage:
 	Please note: LazyCron hooks are only executed during 
 	pageviews that are delivered by ProcessWire. They are not 
 	executed when using ProcessWire's API from other scripts.
+	
+Version history:
+================
+1.0.0 	Original version
+1.0.1	Minor bugfixes
+1.1.0	Added debug feature and fixed a publication bug

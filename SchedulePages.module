@@ -59,7 +59,7 @@ class SchedulePages extends WireData implements Module, ConfigurableModule {
 			'title' => 'Schedule Pages',
 
 			// version: major, minor, revision, i.e. 100 = 1.0.0
-			'version' => 101,
+			'version' => 110,
 
 			// summary is brief description of what this module is
 			'summary' => 'This module allows scheduling (un)publication of pages.',
@@ -148,31 +148,44 @@ class SchedulePages extends WireData implements Module, ConfigurableModule {
 	 */
 	public function RunSchedulePages() {
 		$time = time(); // Get timestamp for current date
-
+			
 		// Select unpublished sites with a publish_from date < the current date and
 		// add them to an array.
-		$unpublished = wire("pages")->find("status=unpublished, publish_from<$time");
+		$unpublished = wire("pages")->find("status=unpublished");
 		foreach($unpublished as $p) {
 			$p->setOutputFormatting(false); // Avoid date being formated.
-			// Publish pages with a publish_until date > current date (and publish_until is set)
-			if ($p->publish_until > 0 && $p->publish_until <= $time) {
-				// We keep it unpublished, since publish until is set and valid
-			} else if ($p->publish_from) {
-				// If publish_from is defined, publish page
-				$p->removeStatus(Page::statusUnpublished);
-				$p->save();
+			// Check if current time is greater than publish_from
+			if ($p->publish_from<$time) {
+				// Publish pages with a publish_until date > current date (and publish_until is set)
+				if ($p->publish_until > 0 && $p->publish_until <= $time) {
+					// We keep it unpublished, since publish until is set and valid
+				} else if ($p->publish_from) {
+					// If publish_from is defined, publish page
+					$p->removeStatus(Page::statusUnpublished);
+					$p->save();
+					if ($this->debug == "1") {
+						$p->setOutputFormatting(true);
+						$this->message("Published $p->url with publish_from value of $p->publish_from and publish_until value of $p->publish_until. Current timestamp is " . date('Y-m-d H:i:s',$time) .".", Notice::log);
+						$p->setOutputFormatting(false);
+					}
+				}
 			}
 		}
 
 		// Select published sites with a publish_until date add them to an array.
-		$published = wire("pages")->find("status=published, publish_until>0");
+		$published = wire("pages")->find("status<" . Page::statusUnpublished . ", publish_until>0");
 		foreach($published as $p) {
 			$p->setOutputFormatting(false); // Avoid date being formated.
 			// Unpublish pages with a publish_until date <= current date
 			if($p->publish_until <= $time) {
 				$p->addStatus(Page::statusUnpublished);
 				$p->save();
-			}
+				if ($this->debug == "1") {
+					$p->setOutputFormatting(true);
+					$this->message("Unpublished $p->url with publish_from value of $p->publish_from and publish_until value of $p->publish_until. Current timestamp is " . date('Y-m-d H:i:s',$time) .".", Notice::log);
+					$p->setOutputFormatting(false);
+					}
+				}
 		}
 	}
 
@@ -187,7 +200,7 @@ class SchedulePages extends WireData implements Module, ConfigurableModule {
 		$field = $modules->get("InputfieldSelect");
 		$field->name = "cronInterval";
 		$field->label = "Cron interval";
-		$field->description = "How often we check if any page needs to be (un)published.";
+		$field->description = "How often shall we check if any page needs to be (un)published.";
 		$field->value = $data['cronInterval'];
 		$field->addOption('everyHour', 'Every hour');
 		$field->addOption('everyMinute', 'Every minute');
@@ -198,7 +211,18 @@ class SchedulePages extends WireData implements Module, ConfigurableModule {
 		$field->addOption('every12Hours', 'Every 12 hours');
 		$field->addOption('everyDay', 'Every day');
 		$field->notes = "If you are not sure, choose Every hour.";
+		
+		$field2 = $modules->get("InputfieldSelect");
+		$field2->name = "debug";
+		$field2->label = "Debug";
+		$field2->description = "Do you want to run this module in debug mode?";
+		$field2->value = $data['debug'];
+		$field2->addOption('0', 'No');
+		$field2->addOption('1', 'Yes');
+		$field2->notes = "If choose yes, all publish and unpublish events will be logged in the messages.txt file in /assets/logs/.";
+		
 		$fields->add($field);
+		$fields->add($field2);
 
 		return $fields;
 	}
