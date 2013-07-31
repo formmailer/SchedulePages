@@ -43,3 +43,4 @@ Version history:
 1.0.0 	Original version
 1.0.1	Minor bugfixes
 1.1.0	Added debug feature and fixed a publication bug
+1.1.1	Added full language support and renamed $time variable to $currenttime
