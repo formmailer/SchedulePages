@@ -201,7 +201,7 @@ class SchedulePages extends WireData implements Module, ConfigurableModule {
 		$field->name = "cronInterval";
 		$field->label =  __("Cron interval");
 		$field->description =  __("How often shall we check if any page needs to be (un)published.");
-		$field->value = $data['cronInterval'];
+		if (isset($data['cronInterval'])) $field->value = $data['cronInterval'];
 		$field->addOption('everyHour',  __('Every hour'));
 		$field->addOption('everyMinute',  __('Every minute'));
 		$field->addOption('every2Minutes',  __('Every 2 minutes'));
@@ -216,7 +216,7 @@ class SchedulePages extends WireData implements Module, ConfigurableModule {
 		$field2->name = "debug";
 		$field2->label =  __("Debug");
 		$field2->description =  __("Do you want to run this module in debug mode?");
-		$field2->value = $data['debug'];
+		if (isset($data['debug'])) $field2->value = $data['debug'];
 		$field2->addOption('0', __('No'));
 		$field2->addOption('1', __('Yes'));
 		$field2->notes =  __("If choose yes, all publish and unpublish events will be logged in the messages.txt file in /assets/logs/.");
