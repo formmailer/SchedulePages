@@ -98,9 +98,27 @@ class SchedulePages extends WireData implements Module, ConfigurableModule {
 			$this->addHook('LazyCron::everyHour', $this, 'RunSchedulePages');
 		}
 
+		// add a hook before the $pages->save, to check wheter the publish_from field needs to be cleared
+		$this->pages->addHookBefore('save', $this, 'beforeSave');
+
 		// add a hook after the $pages->save, to check wheter current page should be published or not
 		$this->pages->addHookAfter('save', $this, 'afterSave');
 	}
+
+	public function beforeSave($event) {
+		$page = $event->arguments[0];
+
+		// Clear the publish_from field automatically when the page is manually
+		// unpublished. This prevents the page from being unintentionally
+		// re-published on the next cron run.
+		if ($page->isChanged('status') && $page->is(Page::statusUnpublished) && $page->publish_from) {
+			$this->session->error($this->_("“Publish From Date” field was cleared to prevent the page from being unintentionally re-published on the next Lazy Cron run."));
+			$page->publish_from = null;
+			$page->save('publish_from');
+		}
+
+	}
+
 
 	public function afterSave($event) {
 		$page = $event->arguments[0];
@@ -111,16 +129,6 @@ class SchedulePages extends WireData implements Module, ConfigurableModule {
 		// in case a page is published manually
 		if ($this->autofillPublishFrom == "1" && !$page->is(Page::statusUnpublished) && !$page->publish_from && $page->template->hasField('publish_from')) {
 			$page->publish_from = $currenttime ;
-			$page->save('publish_from');
-		}
-
-		// Clear the publish_from field automatically when it contains a date
-		// from the past and the page is saved unpublished. This prevents the
-		// page from being unintentionally published resp. re-published on the
-		// next cron run.
-		if ($page->is(Page::statusUnpublished) && $page->template->hasField('publish_from') && $page->publish_from < $currenttime) {
-			$this->session->error($this->_("“Publish From Date” field was cleared because it contained a date which lies in the past. This would have caused the page to be (unintentionally) published resp. re-published on the next Lazy Cron run. Obviously this was not your intention since you chose to only save and not publish the page."));
-			$page->publish_from = null;
 			$page->save('publish_from');
 		}
 

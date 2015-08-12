@@ -46,7 +46,6 @@ Version history:
 1.1.1  Added full language support and renamed $time variable to $currenttime
 1.2.0  Added feature: Always use “Publish From Date” field to store publishing
        timestamp
-1.2.1  The publish_from field is now automatically cleared when it contains a
-       date from the past and the page is saved unpublished. This prevents the
-       page from being unintentionally published resp. re-published on the next
-       cron run.
+1.2.1  The publish_from field is now automatically cleared when the page is
+       manually unpublished. This prevents the page from being unintentionally
+       re-published on the next cron run.
