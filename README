@@ -19,29 +19,34 @@ http://www.ryancramer.com
 
 Usage:
 ======
-1. 	Place the SchedulePages.module file into the 
-	site/modules folder and install the plugin from the admin
-	area.
-	You can choose how often the cron requires to run. (thanks to
-	Apeisa)
-2.	The LazyCron module will be installed (if you haven't already).
-	This module is part of the Processwire core, but it isn't
-	activated by default.
-3.	Add the following date fields to your template: 
-	publish_from
-	publish_until
-	Note: the fields are already created during the 
+1.  Place the SchedulePages.module file into the 
+    site/modules folder and install the plugin from the admin
+    area.
+    You can choose how often the cron requires to run. (thanks to
+    Apeisa)
+2.  The LazyCron module will be installed (if you haven't already).
+    This module is part of the Processwire core, but it isn't
+    activated by default.
+3.  Add the following date fields to your template: 
+    publish_from
+    publish_until
+    Note: the fields are already created during the 
 	installation of the module
-4.	That't all. LazyCron will run take care of (un)publishing
-	your pages that have a the publish dates set.
-	Please note: LazyCron hooks are only executed during 
-	pageviews that are delivered by ProcessWire. They are not 
-	executed when using ProcessWire's API from other scripts.
+4.  That't all. LazyCron will run take care of (un)publishing
+    your pages that have a the publish dates set.
+    Please note: LazyCron hooks are only executed during 
+    pageviews that are delivered by ProcessWire. They are not 
+    executed when using ProcessWire's API from other scripts.
 	
 Version history:
 ================
-1.0.0 	Original version
-1.0.1	Minor bugfixes
-1.1.0	Added debug feature and fixed a publication bug
-1.1.1	Added full language support and renamed $time variable to $currenttime
-1.2.0	Added feature: Always use “Publish From Date” field to store publishing timestamp
+1.0.0  Original version
+1.0.1  Minor bugfixes
+1.1.0  Added debug feature and fixed a publication bug
+1.1.1  Added full language support and renamed $time variable to $currenttime
+1.2.0  Added feature: Always use “Publish From Date” field to store publishing
+       timestamp
+1.2.1  The publish_from field is now automatically cleared when it contains a
+       date from the past and the page is saved unpublished. This prevents the
+       page from being unintentionally published resp. re-published on the next
+       cron run.

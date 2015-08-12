@@ -59,7 +59,7 @@ class SchedulePages extends WireData implements Module, ConfigurableModule {
 			'title' => 'Schedule Pages',
 
 			// version: major, minor, revision, i.e. 100 = 1.0.0
-			'version' => 120,
+			'version' => 121,
 
 			// summary is brief description of what this module is
 			'summary' => 'This module allows scheduling (un)publication of pages.',
@@ -111,6 +111,16 @@ class SchedulePages extends WireData implements Module, ConfigurableModule {
 		// in case a page is published manually
 		if ($this->autofillPublishFrom == "1" && !$page->is(Page::statusUnpublished) && !$page->publish_from && $page->template->hasField('publish_from')) {
 			$page->publish_from = $currenttime ;
+			$page->save('publish_from');
+		}
+
+		// Clear the publish_from field automatically when it contains a date
+		// from the past and the page is saved unpublished. This prevents the
+		// page from being unintentionally published resp. re-published on the
+		// next cron run.
+		if ($page->is(Page::statusUnpublished) && $page->template->hasField('publish_from') && $page->publish_from < $currenttime) {
+			$this->session->error($this->_("“Publish From Date” field was cleared because it contained a date which lies in the past. This would have caused the page to be (unintentionally) published resp. re-published on the next Lazy Cron run. Obviously this was not your intention since you chose to only save and not publish the page."));
+			$page->publish_from = null;
 			$page->save('publish_from');
 		}
 
