@@ -105,22 +105,17 @@ class SchedulePages extends WireData implements Module, ConfigurableModule {
 	public function afterSave($event) {
 		$page = $event->arguments[0];
 
+		$currenttime = time();
+
 		// Fill the publish_from field automatically with the current timestamp
 		// in case a page is published manually
-		if ($this->autofillPublishFrom == "1") {
-			// Don’t touch unpublished pages.
-			// Don’t touch pages with the publish_from field already filled.
-			// Don’t touch pages which don’t have a publish_from field.
-			if ($page->is(Page::statusUnpublished) || $page->publish_from || !$page->template->hasField('publish_from')) return;
-			//if page is published and publish_from not populated, add current timestamp
-			$page->publish_from = time();
+		if ($this->autofillPublishFrom == "1" && !$page->is(Page::statusUnpublished) && !$page->publish_from && $page->template->hasField('publish_from')) {
+			$page->publish_from = $currenttime ;
 			$page->save('publish_from');
 		}
 
 		// If we are missing both publish-fields, then no need to go further
 		if(!isset($page->publish_until) || !isset($page->publish_from)) return;
-
-		$currenttime = time();
 
 		// Check if publish_from and _until dates doesn't make any sense and disallow publishing if so
 		if ($page->publish_from > $page->publish_until && $page->publish_from && $page->publish_until) {
