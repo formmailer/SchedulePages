@@ -59,7 +59,7 @@ class SchedulePages extends WireData implements Module, ConfigurableModule {
 			'title' => 'Schedule Pages',
 
 			// version: major, minor, revision, i.e. 100 = 1.0.0
-			'version' => 111,
+			'version' => 120,
 
 			// summary is brief description of what this module is
 			'summary' => 'This module allows scheduling (un)publication of pages.',
@@ -105,10 +105,17 @@ class SchedulePages extends WireData implements Module, ConfigurableModule {
 	public function afterSave($event) {
 		$page = $event->arguments[0];
 
+		$currenttime = time();
+
+		// Fill the publish_from field automatically with the current timestamp
+		// in case a page is published manually
+		if ($this->autofillPublishFrom == "1" && !$page->is(Page::statusUnpublished) && !$page->publish_from && $page->template->hasField('publish_from')) {
+			$page->publish_from = $currenttime ;
+			$page->save('publish_from');
+		}
+
 		// If we are missing both publish-fields, then no need to go further
 		if(!isset($page->publish_until) || !isset($page->publish_from)) return;
-
-		$currenttime = time();
 
 		// Check if publish_from and _until dates doesn't make any sense and disallow publishing if so
 		if ($page->publish_from > $page->publish_until && $page->publish_from && $page->publish_until) {
@@ -139,6 +146,7 @@ class SchedulePages extends WireData implements Module, ConfigurableModule {
 			$page->save();
 			return;
 		}
+
 	}
 
 
@@ -221,7 +229,17 @@ class SchedulePages extends WireData implements Module, ConfigurableModule {
 		$field2->addOption('1', __('Yes'));
 		$field2->notes =  __("If choose yes, all publish and unpublish events will be logged in the messages.txt file in /assets/logs/.");
 		
+		$field3 = $modules->get("InputfieldSelect");
+		$field3->name = "autofillPublishFrom";
+		$field3->label =  __("Always use “Publish From Date” field to store publishing timestamp");
+		$field3->description =  __("Do you want to fill the “Publish From Date” field with the current timestamp in case a page is published manually?");
+		if (isset($data['autofillPublishFrom'])) $field3->value = $data['autofillPublishFrom'];
+		$field3->addOption('0', __('No'));
+		$field3->addOption('1', __('Yes'));
+		$field3->notes =  __("This way the “Publish From Date” field always contains a page’s publishing date – even if there was no scheduling via the “Publish From Date” field.");
+
 		$fields->add($field);
+		$fields->add($field3);
 		$fields->add($field2);
 
 		return $fields;
