@@ -59,7 +59,7 @@ class SchedulePages extends WireData implements Module, ConfigurableModule {
 			'title' => 'Schedule Pages',
 
 			// version: major, minor, revision, i.e. 100 = 1.0.0
-			'version' => 120,
+			'version' => 121,
 
 			// summary is brief description of what this module is
 			'summary' => 'This module allows scheduling (un)publication of pages.',
@@ -98,9 +98,27 @@ class SchedulePages extends WireData implements Module, ConfigurableModule {
 			$this->addHook('LazyCron::everyHour', $this, 'RunSchedulePages');
 		}
 
+		// add a hook before the $pages->save, to check wheter the publish_from field needs to be cleared
+		$this->pages->addHookBefore('save', $this, 'beforeSave');
+
 		// add a hook after the $pages->save, to check wheter current page should be published or not
 		$this->pages->addHookAfter('save', $this, 'afterSave');
 	}
+
+	public function beforeSave($event) {
+		$page = $event->arguments[0];
+
+		// Clear the publish_from field automatically when the page is manually
+		// unpublished. This prevents the page from being unintentionally
+		// re-published on the next cron run.
+		if ($page->isChanged('status') && $page->is(Page::statusUnpublished) && $page->publish_from) {
+			$this->session->error($this->_("“Publish From Date” field was cleared to prevent the page from being unintentionally re-published on the next Lazy Cron run."));
+			$page->publish_from = null;
+			$page->save('publish_from');
+		}
+
+	}
+
 
 	public function afterSave($event) {
 		$page = $event->arguments[0];
