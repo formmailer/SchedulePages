@@ -105,19 +105,27 @@ class SchedulePages extends WireData implements Module, ConfigurableModule {
 		$this->pages->addHookAfter('save', $this, 'afterSave');
 	}
 
-	public function beforeSave($event) {
-		$page = $event->arguments[0];
+public function beforeSave($event) {
+        $page = $event->arguments[0];
 
-		// Clear the publish_from field automatically when the page is manually
-		// unpublished. This prevents the page from being unintentionally
-		// re-published on the next cron run.
-		if ($page->isChanged('status') && $page->is(Page::statusUnpublished) && $page->publish_from) {
-			$this->session->error($this->_("“Publish From Date” field was cleared to prevent the page from being unintentionally re-published on the next Lazy Cron run."));
-			$page->publish_from = null;
-			$page->save('publish_from');
-		}
+        // Clear the publish_from field automatically when the page is manually
+        // unpublished. This prevents the page from being unintentionally
+        // re-published on the next cron run.
 
-	}
+        // prevent this hook being run two times
+        if($page->schedulerSkip) return;
+
+        // wire("log")->save("scheduler-debug", "status: $page->status"); // debug to see
+
+        if ($page->isChanged('status') && $page->is(Page::statusUnpublished) && $page->publish_from) {
+            $this->session->error($this->_("“Publish From Date” field was cleared to prevent the page from being unintentionally re-published on the next Lazy Cron run."));
+            $page->publish_from = null;
+            $page->save('publish_from');
+        }
+
+        // set flag to prevent multiple runs
+        $page->schedulerSkip = true;
+    }
 
 
 	public function afterSave($event) {
