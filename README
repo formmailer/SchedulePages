@@ -9,7 +9,7 @@ module by Ryan Cramer.
 
 Module is intended for:
 
-ProcessWire 2.x 
+ProcessWire 2.x and 3.x
 Copyright (C) 2011 by Ryan Cramer 
 Licensed under GNU/GPL v2, see LICENSE.TXT
 
@@ -48,4 +48,5 @@ Version history:
        timestamp
 1.2.1  The publish_from field is now automatically cleared when the page is
        manually unpublished. This prevents the page from being unintentionally
-       re-published on the next cron run.
+       re-published on the next cron run.	
+1.2.2  Minor bugfix. Duplicating pages was not working.
