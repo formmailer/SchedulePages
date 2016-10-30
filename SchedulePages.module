@@ -59,7 +59,7 @@ class SchedulePages extends WireData implements Module, ConfigurableModule {
 			'title' => 'Schedule Pages',
 
 			// version: major, minor, revision, i.e. 100 = 1.0.0
-			'version' => 121,
+			'version' => 122,
 
 			// summary is brief description of what this module is
 			'summary' => 'This module allows scheduling (un)publication of pages.',
@@ -182,7 +182,7 @@ public function beforeSave($event) {
 	 */
 	public function RunSchedulePages() {
 		$currenttime = time(); // Get timestamp for current date
-			
+
 		// Select unpublished sites with a publish_from date < the current date and
 		// add them to an array.
 		$unpublished = wire("pages")->find("status=unpublished");
@@ -245,7 +245,7 @@ public function beforeSave($event) {
 		$field->addOption('every12Hours',  __('Every 12 hours'));
 		$field->addOption('everyDay',  __('Every day'));
 		$field->notes =  __("If you are not sure, choose Every hour.");
-		
+
 		$field2 = $modules->get("InputfieldSelect");
 		$field2->name = "debug";
 		$field2->label =  __("Debug");
@@ -254,7 +254,7 @@ public function beforeSave($event) {
 		$field2->addOption('0', __('No'));
 		$field2->addOption('1', __('Yes'));
 		$field2->notes =  __("If choose yes, all publish and unpublish events will be logged in the messages.txt file in /assets/logs/.");
-		
+
 		$field3 = $modules->get("InputfieldSelect");
 		$field3->name = "autofillPublishFrom";
 		$field3->label =  __("Always use “Publish From Date” field to store publishing timestamp");
