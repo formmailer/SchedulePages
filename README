@@ -37,6 +37,24 @@ Usage:
     Please note: LazyCron hooks are only executed during 
     pageviews that are delivered by ProcessWire. They are not 
     executed when using ProcessWire's API from other scripts.
+
+
+Update via composer:
+====================
+You can load this module by adding this to your composer.json in processwire and run `composer update`
+`
+{
+  "require": {
+    "formmailer/schedulepages": "^1.2.2"
+  },
+  "repositories": [
+    { "type": "github", "url": "https://github.com/formmailer/SchedulePages"  }
+  ]
+}
+`
+Feel free to use your own github url when you have forked this module
+
+
 	
 Version history:
 ================

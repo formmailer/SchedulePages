@@ -1,0 +1,50 @@
+{
+  "name": "formmailer/schedulepages",
+  "description": "This module allows scheduling (un)publication of pages.",
+  "homepage": "http://www.processwire.com/talk/topic/711-release-schedulepages/",
+  "keywords": ["processwire"],
+  "version": "1.2.2",
+  "type": "pw-module",
+  "license": [
+    "GNU/GPL v2"
+  ],
+  "authors": [
+    {
+      "name": "Jasper Metselaar",
+      "email": "jasper@formmailer.net",
+      "role": "Developer",
+      "homepage": "https://github.com/formmailer"
+    },
+    {
+      "name": "Antti Peisa",
+      "email": "antti.peisa@gmail.com",
+      "role": "Developer",
+      "homepage": "https://github.com/apeisa"
+    },
+    {
+      "name": "TeppoKoivula",
+      "email": "teppo@piikkilanka.com",
+      "role": "Developer",
+      "homepage": "https://github.com/teppokoivula"
+    },
+    {
+      "name": "Michael van Laar",
+      "email": "michael@van-laar.de",
+      "role": "Developer",
+      "homepage": "https://github.com/MichaelvanLaar"
+    }
+  ],
+  "support": {
+    "source": "https://github.com/formmailer/SchedulePages/tree/master",
+    "issues": "https://github.com/formmailer/SchedulePages/issues",
+    "forum":  "http://www.processwire.com/talk/topic/711-release-schedulepages/"
+  },
+  "require": {
+    "hari/pw-module": "~1.0"
+  },
+  "extra": {
+    "branch-alias": {
+      "dev-master": "0.2.x-dev"
+    }
+  }
+}
