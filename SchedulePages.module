@@ -41,6 +41,11 @@
  *		Please note: LazyCron hooks are only executed during
  *		pageviews that are delivered by ProcessWire. They are not
  *		executed when using ProcessWire's API from other scripts.
+
+ * 		$page->hasChanges() returns always true, scheduler runs @all templates regardles of usage and sets schedulerSkip value…
+ * 		Fix: sz2021, to avoid setting schedulerSkip @ all pages, we add selection for temlates where scheduler should run.
+ * 		
+ 
  */
 
 class SchedulePages extends WireData implements Module, ConfigurableModule {
@@ -105,14 +110,30 @@ class SchedulePages extends WireData implements Module, ConfigurableModule {
 		$this->pages->addHookAfter('save', $this, 'afterSave');
 	}
 
+	// config option to enable SchedulePages @defined templates only
+    public function isAllowed($p) {
+		// check if page has one of selected template assigned, if config has no selection hooks will run for all templates
+		if((count($this->enabledTemplates) == 0 || in_array($p->template->name, $this->enabledTemplates))) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+    
+
 public function beforeSave($event) {
         $page = $event->arguments[0];
 
+		// stop here if template is excluded via config setting
+		if(!$this->isAllowed($page)) return;
+		bd("we will run scheduler before save");
+		
         // Clear the publish_from field automatically when the page is manually
         // unpublished. This prevents the page from being unintentionally
         // re-published on the next cron run.
 
-        // prevent this hook being run two times
+		// prevent this hook being run two times
         if($page->schedulerSkip) return;
 
         // wire("log")->save("scheduler-debug", "status: $page->status"); // debug to see
@@ -130,6 +151,10 @@ public function beforeSave($event) {
 
 	public function afterSave($event) {
 		$page = $event->arguments[0];
+
+		// stop here if template is excluded via config setting
+		if(!$this->isAllowed($page)) return;
+		bd("we will run scheduler after save");
 
 		$currenttime = time();
 
@@ -246,6 +271,20 @@ public function beforeSave($event) {
 		$field->addOption('everyDay',  __('Every day'));
 		$field->notes =  __("If you are not sure, choose Every hour.");
 
+
+        $field1 = wire('modules')->get('InputfieldAsmSelect');
+        $field1->attr('name+id', 'enabledTemplates');
+        $field1->label = __('Enabled templates', __FILE__);
+		$field1->description = __('SchedulePages will only run for selected templates. If no templates are chosen, SchedulePages will work for all templates.', __FILE__);
+		$field1->setAsmSelectOption('sortable', false);
+        // populate with all available templates
+        foreach(wire('templates') as $t) {
+            // filter out system templates
+            if(!($t->flags & Template::flagSystem)) $field1->addOption($t->name);
+        }
+        if(isset($data['enabledTemplates'])) $field1->value = $data['enabledTemplates'];
+        
+
 		$field2 = $modules->get("InputfieldSelect");
 		$field2->name = "debug";
 		$field2->label =  __("Debug");
@@ -265,6 +304,7 @@ public function beforeSave($event) {
 		$field3->notes =  __("This way the “Publish From Date” field always contains a page’s publishing date – even if there was no scheduling via the “Publish From Date” field.");
 
 		$fields->add($field);
+		$fields->add($field1);
 		$fields->add($field3);
 		$fields->add($field2);
 
