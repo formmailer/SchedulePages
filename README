@@ -4,13 +4,13 @@ Copyright 2011 by Jasper Metselaar (jasper@formmailer.net)
 Licensed under GNU/GPL v2, see http://processwire.com/about/license/
 
 This module allows makes it possible to schedule (un)publication of
-pages. This version of the plugin module relies on the LazyCron 
+pages. This version of the plugin module relies on the LazyCron
 module by Ryan Cramer.
 
 Module is intended for:
 
 ProcessWire 2.x and 3.x
-Copyright (C) 2011 by Ryan Cramer 
+Copyright (C) 2011 by Ryan Cramer
 Licensed under GNU/GPL v2, see LICENSE.TXT
 
 http://www.processwire.com
@@ -19,7 +19,7 @@ http://www.ryancramer.com
 
 Usage:
 ======
-1.  Place the SchedulePages.module file into the 
+1.  Place the SchedulePages.module file into the
     site/modules folder and install the plugin from the admin
     area.
     You can choose how often the cron requires to run. (thanks to
@@ -27,15 +27,15 @@ Usage:
 2.  The LazyCron module will be installed (if you haven't already).
     This module is part of the Processwire core, but it isn't
     activated by default.
-3.  Add the following date fields to your template: 
+3.  Add the following date fields to your template:
     publish_from
     publish_until
-    Note: the fields are already created during the 
+    Note: the fields are already created during the
 	installation of the module
 4.  That't all. LazyCron will run take care of (un)publishing
     your pages that have a the publish dates set.
-    Please note: LazyCron hooks are only executed during 
-    pageviews that are delivered by ProcessWire. They are not 
+    Please note: LazyCron hooks are only executed during
+    pageviews that are delivered by ProcessWire. They are not
     executed when using ProcessWire's API from other scripts.
 
 
@@ -45,7 +45,7 @@ You can load this module by adding this to your composer.json in processwire and
 `
 {
   "require": {
-    "formmailer/schedulepages": "^1.2.2"
+    "formmailer/schedule-pages": "^1.2.2"
   },
   "repositories": [
     { "type": "github", "url": "https://github.com/formmailer/SchedulePages"  }
@@ -55,7 +55,7 @@ You can load this module by adding this to your composer.json in processwire and
 Feel free to use your own github url when you have forked this module
 
 
-	
+
 Version history:
 ================
 1.0.0  Original version
@@ -66,5 +66,5 @@ Version history:
        timestamp
 1.2.1  The publish_from field is now automatically cleared when the page is
        manually unpublished. This prevents the page from being unintentionally
-       re-published on the next cron run.	
+       re-published on the next cron run.
 1.2.2  Minor bugfix. Duplicating pages was not working.

@@ -1,5 +1,5 @@
 {
-  "name": "formmailer/schedulepages",
+  "name": "formmailer/schedule-pages",
   "description": "This module allows scheduling (un)publication of pages.",
   "homepage": "http://www.processwire.com/talk/topic/711-release-schedulepages/",
   "keywords": ["processwire"],
@@ -44,7 +44,7 @@
   },
   "extra": {
     "branch-alias": {
-      "dev-master": "0.2.x-dev"
+      "dev-master": "1.2.x-dev"
     }
   }
 }
